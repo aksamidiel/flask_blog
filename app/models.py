@@ -20,7 +20,7 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    @login.user_loader
+    @login.user_loader  #пользовательский запрос из базы данных, id пользователя
     def load_user(id):
         return User.query.get(int(id))
 
