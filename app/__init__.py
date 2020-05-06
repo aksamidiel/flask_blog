@@ -7,10 +7,10 @@ from flask_login import LoginManager
 
 app = Flask(__name__)
 app.config.from_object(Config)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)  # add database
+db = SQLAlchemy(app)  # add database SQLALCHEMY
+migrate = Migrate(app, db)  # add mechanism migrations
 login = LoginManager(app)  # add auth logic
-login.login_view = 'login' # add secure abou login user's
+login.login_view = 'login' # add secure about login user's
 
 
 from app import routes, models

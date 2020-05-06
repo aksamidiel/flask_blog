@@ -10,7 +10,6 @@ from werkzeug.urls import url_parse
 @app.route('/index')
 @login_required  # защита от просмотра страниц не залогинившимся пользователям
 def index():
-    user = {'username': 'Miguel'}
     posts = [
         {
             'author': {'username': 'John'},
@@ -37,16 +36,19 @@ def login():
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')  # страница после залогинивания
-        if not next_page or url_parse(next_page).netloc != '':  #проверка next_page на предмет верного перенаправления в объеме сайте
+        if not next_page or url_parse(
+                next_page).netloc != '':  # проверка next_page на предмет верного перенаправления в объеме сайте
             next_page = url_for('index')
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
+
 
 # функция выхода пользователя из системы
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -61,3 +63,14 @@ def register():
         flash('Congratulation, you are register in system')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404() # попытка поиска пользователя в бд
+    posts = [
+        {'author': user, 'body': 'Test post #1'},
+        {'author': user, 'body': 'Test post #2'}
+    ]
+    return render_template('user.html', user=user, posts=posts)
