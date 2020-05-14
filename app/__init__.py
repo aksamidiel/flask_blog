@@ -13,4 +13,4 @@ login = LoginManager(app)  # add auth logic
 login.login_view = 'login' # add secure about login user's
 
 
-from app import routes, models
+from app import routes, models, errors
