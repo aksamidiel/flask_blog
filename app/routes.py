@@ -7,6 +7,7 @@ from werkzeug.urls import url_parse
 from datetime import datetime
 from app.forms import EditProfileForm
 
+
 @app.route('/')
 @app.route('/index')
 @login_required  # защита от просмотра страниц не залогинившимся пользователям
@@ -16,9 +17,15 @@ def index():
             'author': {'username': 'John'},
             'body': 'Beautiful day in Portland!'
         },
+
         {
             'author': {'username': 'Susan'},
             'body': 'The Avengers movie was so cool!'
+        },
+
+        {
+            'author': {'username': 'Alex'},
+            'body': 'Good day in Belarus!'
         }
     ]
     return render_template('index.html', title='Home Page', posts=posts)
@@ -30,6 +37,7 @@ def login():
         return redirect(url_for('index'))
 
     form = LoginForm()
+
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
@@ -83,10 +91,11 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
+
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    form = EditProfileForm()
+    form = EditProfileForm(current_user)
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
