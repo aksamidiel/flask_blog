@@ -37,12 +37,32 @@ class User(UserMixin, db.Model):
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
             digest, size)
 
-    followed = db.relationship(
-        'User', secondary=followers,
-        primaryjoin=(followers.c.follower_id == id),
-        secondaryjoin=(followers.c.followed_id == id),
-        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic'
-    )
+    def follow(self, user):  # функция добавления последователя
+        if not self.is_following(user):
+            self.followed.append(user)
+
+    def unfollow(self, user):  # функция удаления
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    def is_following(self, user):  # запрос на проверку отношения, существует ли связь
+        return self.followed.filter(
+            followers.c.followed_id == user.id).count() > 0
+
+    def followed_posts(self):
+        return Post.query.join(
+            followers, (followers.c.followed_id == Post.user_id)).filter(
+            followers.c.follower_id == self.id).order_by(
+            Post.timestamp.desc()
+        )
+
+    def followed_posts(self):
+        followed = Post.query.join(
+            followers, (followers.c.followed_id == Post.user_id)).filter(
+            followers.c.follower_id == self.id)
+        own = Post.query.filter_by(user_id=self.id)
+
+        return followed.union(own).order_by(Post.timestamp.desc())
 
 
 class Post(db.Model):
@@ -53,5 +73,3 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
-
-
