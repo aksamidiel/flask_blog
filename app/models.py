@@ -16,8 +16,17 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
 
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
+
     about_me = db.Column(db.String(140))  # доп поля для профиля юзера
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)  # дата последнего пребывания определенного пользователя
+
+    followed = db.relationship(
+        'User', secondary=followers,
+        primaryjoin=(followers.c.follower_id == id),
+        secondaryjoin=(followers.c.followed_id == id),
+        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic'
+    )
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -48,13 +57,6 @@ class User(UserMixin, db.Model):
     def is_following(self, user):  # запрос на проверку отношения, существует ли связь
         return self.followed.filter(
             followers.c.followed_id == user.id).count() > 0
-
-    def followed_posts(self):
-        return Post.query.join(
-            followers, (followers.c.followed_id == Post.user_id)).filter(
-            followers.c.follower_id == self.id).order_by(
-            Post.timestamp.desc()
-        )
 
     def followed_posts(self):
         followed = Post.query.join(

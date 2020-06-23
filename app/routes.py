@@ -9,6 +9,9 @@ from app.forms import EditProfileForm
 
 from app.forms import EmptyForm
 
+from app.forms import ResetPasswordRequestForm  # импорт формы для резета пароля
+from app.email import send_mail  # отправка сообщения на маил
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -121,7 +124,7 @@ def follow(username):  # функция подписки на определен
     form = EmptyForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=username).first()
-        if User is None:
+        if user is None:
             flash('User {} not found'.format(username))
             return redirect(url_for('index'))
         if user == current_user:
@@ -167,3 +170,18 @@ def explore():  # функция просмотра всех сообщений
         if posts.has_prev else None
     return render_template("index.html", title='Explore', posts=posts.items,
                            next_url=next_url, prev_url=prev_url)
+
+
+@app.route('/reset_pass_request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_mail(user)
+        flash('Check your email for the instructions to reset your password')
+        return redirect(url_for('login'))
+    return render_template('reset_pass.html',
+                           title='Reset Password', form=form)

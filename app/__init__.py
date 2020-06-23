@@ -9,6 +9,8 @@ from logging.handlers import SMTPHandler  #
 from logging.handlers import RotatingFileHandler
 import os
 
+from flask_mail import Mail
+
 
 app = Flask(__name__)
 app.config.from_object(Config)  # применение параметров из конфигурационного файла
@@ -16,6 +18,8 @@ db = SQLAlchemy(app)  # add database SQLALCHEMY
 migrate = Migrate(app, db)  # add mechanism migrations
 login = LoginManager(app)  # add auth logic
 login.login_view = 'login' # add secure about login user's
+
+mail = Mail(app)  #экземпляр класса mail
 
 if not app.debug:
     if app.config['MAIL_SERVER']:  #для отправки ошибок на почту
