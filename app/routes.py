@@ -12,6 +12,8 @@ from app.forms import EmptyForm
 from app.forms import ResetPasswordRequestForm  # импорт формы для резета пароля
 from app.email import send_mail  # отправка сообщения на маил
 
+from app.forms import ResetPasswordForm
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -185,3 +187,19 @@ def reset_password_request():
         return redirect(url_for('login'))
     return render_template('reset_pass.html',
                            title='Reset Password', form=form)
+
+@app.route('/reset_pass/<token>', methods=['GET', 'SET'])
+def reset_pass(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.verify_reset_pass_token(token)
+    if not user:
+        return redirect(url_for('index'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash('Your pass has been reset.')
+        return redirect(url_for('login'))
+    return render_template('reset_pass.html', form=form)
+
