@@ -54,3 +54,8 @@ class PostForm(FlaskForm):  # класс для домашней страниц�
     post = TextAreaField('Say something', validators=[DataRequired(),
                                                       Length(min=1, max=140)])
     submit = SubmitField('Submit')
+
+
+class ResetPasswordRequestForm(FlaskForm):   # reset password form
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
