@@ -55,7 +55,7 @@ def login():
                 next_page).netloc != '':  # проверка next_page на предмет верного перенаправления в объеме сайте
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
+    return render_template('auth/login.html', title='Sign In', form=form)
 
 
 # функция выхода пользователя из системы

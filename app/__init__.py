@@ -11,6 +11,8 @@ import os
 
 from flask_mail import Mail
 
+from flask_bootstrap import Bootstrap   #импорт фрейма для внешки
+
 
 app = Flask(__name__)
 app.config.from_object(Config)  # применение параметров из конфигурационного файла
@@ -19,6 +21,10 @@ migrate = Migrate(app, db)  # add mechanism migrations
 login = LoginManager(app)  # add auth logic
 login.login_view = 'login' # add secure about login user's
 mail = Mail(app)  # создание экземпляра класса Mail
+
+mail = Mail(app)  #экземпляр класса mail
+
+bootstrap = Bootstrap(app) #создание экземпляра
 
 if not app.debug:
     if app.config['MAIL_SERVER']:  #для отправки ошибок на почту
