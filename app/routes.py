@@ -7,10 +7,12 @@ from werkzeug.urls import url_parse
 from datetime import datetime
 from app.forms import EditProfileForm
 
-from app.forms import ResetPasswordRequestForm
-from app.mail import send_email
-
 from app.forms import EmptyForm
+
+from app.forms import ResetPasswordRequestForm  # импорт формы для резета пароля
+from app.email import send_mail  # отправка сообщения на маил
+
+from app.forms import ResetPasswordForm
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -55,7 +57,7 @@ def login():
                 next_page).netloc != '':  # проверка next_page на предмет верного перенаправления в объеме сайте
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('auth/login.html', title='Sign In', form=form)
+    return render_template('login.html', title='Sign In', form=form)
 
 
 # функция выхода пользователя из системы
@@ -91,9 +93,8 @@ def user(username):
         if posts.has_next else None
     prev_url = url_for('user', username=user.username, page=posts.prev_num) \
         if posts.has_prev else None
-    form = EmptyForm()
     return render_template('user.html', user=user, posts=posts.items,
-                           next_url=next_url, prev_url=prev_url, form=form)
+                           next_url=next_url, prev_url=prev_url)
 
 
 @app.before_request
@@ -172,7 +173,8 @@ def explore():  # функция просмотра всех сообщений
     return render_template("index.html", title='Explore', posts=posts.items,
                            next_url=next_url, prev_url=prev_url)
 
-@app.route('/reset_password_request', methods=['GET', 'POST'])
+
+@app.route('/reset_pass_request', methods=['GET', 'POST'])
 def reset_password_request():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -180,9 +182,24 @@ def reset_password_request():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            send_email(user)
+            send_mail(user)
         flash('Check your email for the instructions to reset your password')
         return redirect(url_for('login'))
-    return render_template('reset_password_request.html',
+    return render_template('reset_pass.html',
                            title='Reset Password', form=form)
+
+@app.route('/reset_pass/<token>', methods=['GET', 'SET'])
+def reset_pass(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.verify_reset_pass_token(token)
+    if not user:
+        return redirect(url_for('index'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash('Your pass has been reset.')
+        return redirect(url_for('login'))
+    return render_template('reset_pass.html', form=form)
 

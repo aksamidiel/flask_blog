@@ -23,8 +23,8 @@ def send_pass_reset_email(user):
     send_mail('[MICROBLOG] Reset your pass',
               sender=app.config['ADMINS'][0],
               recipients=[user.email],
-              text_body=render_template('email/reset_password.html',
+              text_body=render_template('email/reset_pass.html',
                                         user=user, token=token),
-              html_body=render_template('email/reset_password.html',
+              html_body=render_template('email/reset_pass.html',
                                         user=user, token=token)
               )
