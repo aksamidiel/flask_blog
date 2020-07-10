@@ -10,6 +10,9 @@ from logging.handlers import RotatingFileHandler
 import os
 
 from flask_mail import Mail
+from flask_bootstrap import Bootstrap # для внешнего оформления
+from flask_moment import Moment   # применяется для решения проблем с датами
+from flask_babel import Babel # для переводов
 
 
 app = Flask(__name__)
@@ -20,6 +23,9 @@ login = LoginManager(app)  # add auth logic
 login.login_view = 'login' # add secure about login user's
 
 mail = Mail(app)  #экземпляр класса mail
+bootstrap = Bootstrap(app)
+moment = Moment(app)
+babel = Babel(app)
 
 if not app.debug:
     if app.config['MAIL_SERVER']:  #для отправки ошибок на почту
