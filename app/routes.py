@@ -14,6 +14,9 @@ from app.email import send_mail  # отправка сообщения на ма
 
 from app.forms import ResetPasswordForm
 
+from flask import g
+from flask_babel import get_locale
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -102,6 +105,7 @@ def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
+        g.locale = str(get_locale())
 
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -188,6 +192,7 @@ def reset_password_request():
     return render_template('reset_pass.html',
                            title='Reset Password', form=form)
 
+
 @app.route('/reset_pass/<token>', methods=['GET', 'SET'])
 def reset_pass(token):
     if current_user.is_authenticated:
@@ -202,4 +207,5 @@ def reset_pass(token):
         flash('Your pass has been reset.')
         return redirect(url_for('login'))
     return render_template('reset_pass.html', form=form)
+
 

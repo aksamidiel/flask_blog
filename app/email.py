@@ -1,7 +1,9 @@
-from flask_mail import Message
-from app import mail, app
-from flask import render_template
 from threading import Thread
+
+from flask import render_template
+from flask_mail import Message
+
+from app import mail, app
 
 
 # функция позволяет отправлять сообщения на почту
