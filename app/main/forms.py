@@ -19,14 +19,13 @@ class EditProfileForm(FlaskForm):
         if username.data != self.original_username:
             user = User.query.filter_by(username=self.username.data).first()
             if user is not None:
-                raise ValidationError(_l('Please use a different username! '))
+                raise ValidationError(_('Please use a different username! '))
 
 
 class EmptyForm(FlaskForm):
-    submit = SubmitField(_l('Submit'))
+    submit = SubmitField('Submit')
 
 
 class PostForm(FlaskForm):  # класс для домашней страницы
-    post = TextAreaField(_l('Say something'), validators=[DataRequired(),
-                                                          Length(min=1, max=140)])
+    post = TextAreaField(_l('Say something'), validators=[DataRequired()])
     submit = SubmitField(_l('Submit'))

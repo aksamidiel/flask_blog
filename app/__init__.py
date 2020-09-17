@@ -16,10 +16,6 @@ from flask_babel import Babel  # для переводов
 from flask_babel import lazy_gettext as _l
 from flask import request
 
-
-
-
-
 db = SQLAlchemy()  # add database SQLALCHEMY
 migrate = Migrate()  # add mechanism migrations
 login = LoginManager()  # add auth logic
@@ -30,6 +26,7 @@ mail = Mail()  # экземпляр класса mail
 bootstrap = Bootstrap()
 moment = Moment()
 babel = Babel()
+
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -42,10 +39,10 @@ def create_app(config_class=Config):
     bootstrap.init_app(app)
     moment.init_app(app)
     babel.init_app(app)
- 
+
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
-    
+
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
@@ -74,7 +71,7 @@ def create_app(config_class=Config):
                 os.mkdir('logs')
             file_handler = RotatingFileHandler('logs/microblog.log', maxBytes=10240, backupCount=10)
             file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: '
-                                                    '%(message)s [in %(pathname)s:%(lineno)d]'))
+                                                        '%(message)s [in %(pathname)s:%(lineno)d]'))
             file_handler.setLevel(logging.INFO)
             app.logger.addHandler(file_handler)
 
@@ -84,6 +81,11 @@ def create_app(config_class=Config):
     return app
 
 
+from app.errors import bp as errors_bp
+
+current_app.register_blueprint(errors_bp)
+
+
 # позволяет выбирать язык для перевода
 @babel.localeselector
 def get_locale():
@@ -91,4 +93,3 @@ def get_locale():
 
 
 from app import models
-

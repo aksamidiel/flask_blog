@@ -24,7 +24,7 @@ class RegistrationForm(FlaskForm):
     def validate_username(self, username):  # собственные валидаторы в дополнении к WTF
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
-            raise ValidationError(_l('Please use a different username'))
+            raise ValidationError(_('Please use a different username'))
 
     def validate_email(self, email):  # собственные валидаторы в дополнении к WTF
         user = User.query.filter_by(email=email.data).first()
@@ -33,7 +33,7 @@ class RegistrationForm(FlaskForm):
 
 
 class ResetPasswordRequestForm(FlaskForm):  # класс для формы сброса пароля
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField(_l('Email', validators=[DataRequired(), Email()]))
     submit = SubmitField(_l('Request Pass Reset'))
 
 
